@@ -62,7 +62,44 @@ async function run(){
             const review = req.body;
             const result =  await reviewCollection.insertOne(review);
             res.send(result);
-        })     
+        })
+
+        
+        app.get('/review', async(req, res)=>{
+            // console.log(req.query);
+            let query = {};
+            if(req.query.email){
+                query = {
+                    email: req.query.email
+                }
+            }
+            const cursor = reviewCollection.find(query);
+            const myReview = await cursor.toArray();
+            res.send(myReview);
+     
+        })
+
+        app.delete('/review/:id', async(req,res)=>{
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)};
+            const result = await reviewCollection.deleteOne(query);
+            res.send(result)
+        })
+
+        app.patch('/review/:id', async(req, res)=>{
+        const id = req.params.id;
+        const updatedReview = req.body.review;
+        const query = {_id: ObjectId(id)};
+        const updateDoc = {
+            $set: {
+                review: updatedReview
+            },
+          };
+        const result = await reviewCollection.updateOne(query, updateDoc);
+        res.send(result);
+    })
+        
+    
         
     } finally {
     // await client.close();
